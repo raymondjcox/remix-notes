@@ -3,7 +3,6 @@
 app = "summer-dream-5405"
 
 kill_signal = "SIGINT"
-private_network = true
 kill_timeout = 5
 processes = []
 
