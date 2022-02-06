@@ -1,12 +1,21 @@
+import styles from "./styles/app.css";
+
+import { prisma } from "./db";
+
 import {
   Links,
   LiveReload,
   Meta,
   Outlet,
   Scripts,
-  ScrollRestoration
+  ScrollRestoration,
+  redirect,
 } from "remix";
 import type { MetaFunction } from "remix";
+
+export function links() {
+  return [{ rel: "stylesheet", href: styles }];
+}
 
 export const meta: MetaFunction = () => {
   return { title: "New Remix App" };
