@@ -3,6 +3,7 @@
 app = "summer-dream-5405"
 
 kill_signal = "SIGINT"
+private_network = true
 kill_timeout = 5
 processes = []
 
@@ -14,7 +15,7 @@ processes = []
 
 [[services]]
   http_checks = []
-  internal_port = 8080
+  internal_port = 3000
   processes = ["app"]
   protocol = "tcp"
   script_checks = []
