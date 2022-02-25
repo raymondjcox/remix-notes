@@ -1,7 +1,5 @@
 import styles from "./styles/app.css";
 
-import { prisma } from "./db";
-
 import {
   Links,
   LiveReload,
@@ -9,7 +7,6 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  redirect,
 } from "remix";
 import type { MetaFunction } from "remix";
 
@@ -18,7 +15,7 @@ export function links() {
 }
 
 export const meta: MetaFunction = () => {
-  return { title: "New Remix App" };
+  return { title: "Notes" };
 };
 
 export default function App() {
