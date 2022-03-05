@@ -607,19 +607,3 @@ Ensure the default browser behavior of the `hidden` attribute.
   outline: 2px solid transparent;
   outline-offset: 2px;
 }
-
-.outline-0 {
-  outline-width: 0px;
-}
-
-.outline-slate-600 {
-  outline-color: #475569;
-}
-
-.outline-slate-800 {
-  outline-color: #1e293b;
-}
-
-.outline-slate-900 {
-  outline-color: #0f172a;
-}
