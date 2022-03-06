@@ -6,9 +6,8 @@ import {
   redirect,
   Outlet,
   useParams,
-  useLocation,
 } from "remix";
-import { DocumentAddIcon, TrashIcon } from "@heroicons/react/solid";
+import { DocumentAddIcon, TrashIcon, SunIcon } from "@heroicons/react/outline";
 import type { LoaderFunction } from "remix";
 import { db } from "~/utils/db.server";
 
@@ -30,12 +29,13 @@ export async function action({ request }) {
   const noteId = formData.get("noteId");
 
   if (formData.get("_action") === "create") {
-    await db.note.create({
+    const newNote = await db.note.create({
       data: {
         title: "Empty note",
         content: "",
       },
     });
+    return redirect(`/notes/${newNote.id}`);
   }
 
   if (formData.get("_action") === "delete" && noteId) {
@@ -46,34 +46,26 @@ export async function action({ request }) {
     });
   }
 
-  redirect(`/notes`);
-  return null;
+  return redirect(`/notes`);
 }
 
 function HeaderMenu() {
   const { id: noteId } = useParams();
   return (
-    <Form method="post">
-      <div className="bg-slate-700 flex align-items pt-2 pb-2 pl-8 gap-4">
+    <div className="bg-slate-700 text-slate-400 flex align-items justify-between pt-2 pb-2 px-8 gap-4">
+      <Form className="flex align-items gap-4" method="post">
         <input type="hidden" name="noteId" value={noteId ?? 0} />
         <button type="submit" name="_action" value="create">
-          <DocumentAddIcon className="h-5 w-5 text-blue-300 cursor-pointer pointer-events-none" />
+          <DocumentAddIcon className="h-5 w-5 cursor-pointer pointer-events-none" />
         </button>
-        <button
-          disabled={!noteId}
-          className={!noteId ? "cursor-not-allowed" : ""}
-          type="submit"
-          name="_action"
-          value="delete"
-        >
-          <TrashIcon
-            className={`h-5 w-5 cursor-pointer pointer-events-none ${
-              noteId ? "text-red-300" : "text-slate-100"
-            }`}
-          />
-        </button>
-      </div>
-    </Form>
+        {noteId && (
+          <button type="submit" name="_action" value="delete">
+            <TrashIcon className="h-5 w-5 cursor-pointer pointer-events-none" />
+          </button>
+        )}
+      </Form>
+      <SunIcon className="h-5 w-5 cursor-pointer pointer-events-none" />
+    </div>
   );
 }
 
@@ -81,16 +73,18 @@ export default function Index() {
   const notes = useLoaderData<Pick<Note, "id" | "title">[]>();
 
   return (
-    <div className="text-slate-300 h-screen flex flex-col">
+    <div className="text-slate-50 h-screen flex flex-col">
       <HeaderMenu />
       <div className="bg-slate-800 flex h-full min-h-0">
         <div className="flex-initial basis-3/12 overflow-auto h-full">
-          <ul className="pl-8 pr-8 overflow-auto divide-y divide-slate-600">
+          <ul className="overflow-auto divide-y divide-slate-600 mx-3 mt-3">
             {notes.map((note) => (
               <li key={note.id}>
                 <NavLink
                   className={({ isActive }) =>
-                    isActive ? "text-amber-500" : ""
+                    isActive
+                      ? "block rounded px-6 bg-yellow-500/[.75] transition-colors"
+                      : "rounded block px-6 transition-colors"
                   }
                   to={`/notes/${note.id}`}
                 >
@@ -111,14 +105,3 @@ export default function Index() {
     </div>
   );
 }
-
-/*
-        <Form replace method="post">
-          <button
-            type="submit"
-            action="/notes?index"
-            className="bg-slate-900 text-white px-2 rounded text-sm">
-            New
-          </button>
-        </Form>
-  */

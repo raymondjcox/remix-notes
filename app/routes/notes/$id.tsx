@@ -54,20 +54,15 @@ export default function Index() {
       ref={ref}
       method="post"
       className="flex flex-col h-full"
-      onChange={(e) => debouncedHandleChange(e.currentTarget)}>
+      onChange={(e) => debouncedHandleChange(e.currentTarget)}
+    >
       <input type="hidden" name="noteId" value={note.id} />
       <textarea
         name="content"
         defaultValue={note.content}
-        className="h-full bg-slate-900 p-2 rounded resize-none outline-none"
+        className="h-full bg-slate-900 p-2 resize-none outline-none"
         placeholder="enter note here"
       />
     </Form>
   );
 }
-
-//<input
-//name="title"
-//defaultValue={note.title}
-//className="bg-slate-900 mb-2 p-2 rounded"
-///>
