@@ -11,17 +11,29 @@ import { DocumentAddIcon, TrashIcon, SunIcon } from "@heroicons/react/outline";
 import type { LoaderFunction } from "remix";
 import { db } from "~/utils/db.server";
 
+interface ReturnedNote extends Pick<Note, "id" | "title" | "content"> {
+  createdAt: string;
+  updatedAt?: string;
+}
+
 export let loader: LoaderFunction = async ({ params }) => {
-  return db.note.findMany({
+  const notes = await db.note.findMany({
     orderBy: {
       id: "desc",
     },
     select: {
       id: true,
       title: true,
+      updatedAt: true,
+      createdAt: true,
       content: false,
     },
   });
+  return notes.map((note) => ({
+    ...note,
+    updatedAt: note?.updatedAt?.toUTCString(),
+    createdAt: note.createdAt.toUTCString(),
+  }));
 };
 
 export async function action({ request }) {
@@ -69,8 +81,36 @@ function HeaderMenu() {
   );
 }
 
+const DateFormat = new Intl.DateTimeFormat("en-US", {
+  day: "numeric",
+  month: "numeric",
+  year: "2-digit",
+});
+
+const TimeFormat = new Intl.DateTimeFormat("en-US", {
+  hour: "numeric",
+  minute: "numeric",
+});
+
+const isToday = (date: Date) => {
+  const today = new Date();
+  return (
+    date.getDate() == today.getDate() &&
+    date.getMonth() == today.getMonth() &&
+    date.getFullYear() == today.getFullYear()
+  );
+};
+
+const formatDate = (date: string): string => {
+  const newDate = new Date(date);
+  if (isToday(newDate)) {
+    return TimeFormat.format(newDate);
+  }
+  return DateFormat.format(newDate);
+};
+
 export default function Index() {
-  const notes = useLoaderData<Pick<Note, "id" | "title">[]>();
+  const notes = useLoaderData<ReturnedNote[]>();
 
   return (
     <div className="text-slate-50 h-screen flex flex-col">
@@ -88,9 +128,13 @@ export default function Index() {
                   }
                   to={`/notes/${note.id}`}
                 >
-                  <div className="flex items-center justify-items-center font-semibold text-sm h-16">
-                    <div className="min-w-0 overflow-ellipsis whitespace-nowrap overflow-hidden">
+                  <div className="flex flex-col justify-center justify-items-center  h-16">
+                    <div className="min-w-0 overflow-ellipsis whitespace-nowrap overflow-hidden font-semibold text-sm">
                       {note.title || "No content"}
+                    </div>
+
+                    <div className="min-w-0 overflow-ellipsis whitespace-nowrap overflow-hidden text-xs">
+                      {formatDate(note.updatedAt ?? note.createdAt)}
                     </div>
                   </div>
                 </NavLink>
