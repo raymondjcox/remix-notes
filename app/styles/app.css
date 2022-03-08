@@ -572,6 +572,11 @@ Ensure the default browser behavior of the `hidden` attribute.
   border-color: rgb(71 85 105 / var(--tw-divide-opacity));
 }
 
+.divide-zinc-600 > :not([hidden]) ~ :not([hidden]) {
+  --tw-divide-opacity: 1;
+  border-color: rgb(82 82 91 / var(--tw-divide-opacity));
+}
+
 .overflow-auto {
   overflow: auto;
 }
@@ -592,6 +597,20 @@ Ensure the default browser behavior of the `hidden` attribute.
   border-radius: 0.25rem;
 }
 
+.border-b {
+  border-bottom-width: 1px;
+}
+
+.border-white {
+  --tw-border-opacity: 1;
+  border-color: rgb(255 255 255 / var(--tw-border-opacity));
+}
+
+.border-slate-600 {
+  --tw-border-opacity: 1;
+  border-color: rgb(71 85 105 / var(--tw-border-opacity));
+}
+
 .bg-slate-700 {
   --tw-bg-opacity: 1;
   background-color: rgb(51 65 85 / var(--tw-bg-opacity));
@@ -609,6 +628,79 @@ Ensure the default browser behavior of the `hidden` attribute.
 .bg-slate-900 {
   --tw-bg-opacity: 1;
   background-color: rgb(15 23 42 / var(--tw-bg-opacity));
+}
+
+.bg-slate-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(100 116 139 / var(--tw-bg-opacity));
+}
+
+.bg-slate-600 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(71 85 105 / var(--tw-bg-opacity));
+}
+
+.bg-slate-500\/\[\.075\] {
+  background-color: rgb(100 116 139 / .075);
+}
+
+.bg-slate-500\/\[\.75\] {
+  background-color: rgb(100 116 139 / .75);
+}
+
+.bg-zinc-700 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(63 63 70 / var(--tw-bg-opacity));
+}
+
+.bg-zinc-800 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(39 39 42 / var(--tw-bg-opacity));
+}
+
+.bg-zinc-500\/\[\.75\] {
+  background-color: rgb(113 113 122 / .75);
+}
+
+.bg-zinc-900 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(24 24 27 / var(--tw-bg-opacity));
+}
+
+.bg-slate-800\/\[\.95\] {
+  background-color: rgb(30 41 59 / .95);
+}
+
+.bg-slate-800\/\[\.98\] {
+  background-color: rgb(30 41 59 / .98);
+}
+
+.bg-slate-900\/\[\.95\] {
+  background-color: rgb(15 23 42 / .95);
+}
+
+.bg-slate-900\/\[\.75\] {
+  background-color: rgb(15 23 42 / .75);
+}
+
+.bg-slate-900\/\[\.90\] {
+  background-color: rgb(15 23 42 / .90);
+}
+
+.bg-slate-900\/\[\.98\] {
+  background-color: rgb(15 23 42 / .98);
+}
+
+.bg-slate-700\/\[\.75\] {
+  background-color: rgb(51 65 85 / .75);
+}
+
+.bg-slate-200\/\[\.75\] {
+  background-color: rgb(226 232 240 / .75);
+}
+
+.bg-slate-600\/\[\.75\] {
+  background-color: rgb(71 85 105 / .75);
 }
 
 .p-2 {
@@ -657,6 +749,36 @@ Ensure the default browser behavior of the `hidden` attribute.
   color: rgb(248 250 252 / var(--tw-text-opacity));
 }
 
+.text-zinc-400 {
+  --tw-text-opacity: 1;
+  color: rgb(161 161 170 / var(--tw-text-opacity));
+}
+
+.text-zinc-50 {
+  --tw-text-opacity: 1;
+  color: rgb(250 250 250 / var(--tw-text-opacity));
+}
+
+.text-slate-100 {
+  --tw-text-opacity: 1;
+  color: rgb(241 245 249 / var(--tw-text-opacity));
+}
+
+.text-slate-500 {
+  --tw-text-opacity: 1;
+  color: rgb(100 116 139 / var(--tw-text-opacity));
+}
+
+.text-slate-300 {
+  --tw-text-opacity: 1;
+  color: rgb(203 213 225 / var(--tw-text-opacity));
+}
+
+.text-slate-200 {
+  --tw-text-opacity: 1;
+  color: rgb(226 232 240 / var(--tw-text-opacity));
+}
+
 .outline-none {
   outline: 2px solid transparent;
   outline-offset: 2px;
@@ -668,4 +790,12 @@ Ensure the default browser behavior of the `hidden` attribute.
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
+}
+
+.focus\:bg-yellow-500\/\[\.75\]:focus {
+  background-color: rgb(234 179 8 / .75);
+}
+
+.active\:bg-yellow-500\/\[\.75\]:active {
+  background-color: rgb(234 179 8 / .75);
 }

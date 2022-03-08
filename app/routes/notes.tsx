@@ -113,18 +113,18 @@ export default function Index() {
   const notes = useLoaderData<ReturnedNote[]>();
 
   return (
-    <div className="text-slate-50 h-screen flex flex-col">
+    <div className="text-slate-200 h-screen flex flex-col">
       <HeaderMenu />
       <div className="bg-slate-800 flex h-full min-h-0">
-        <div className="flex-initial basis-3/12 overflow-auto h-full">
-          <ul className="overflow-auto divide-y divide-slate-600 mx-3 mt-3">
+        <div className="overflow-auto flex-initial basis-3/12 h-full">
+          <ul className="overflow-auto mx-3 mt-3 ">
             {notes.map((note) => (
               <li key={note.id}>
                 <NavLink
                   className={({ isActive }) =>
                     isActive
-                      ? "block rounded px-6 bg-yellow-500/[.75] transition-colors"
-                      : "rounded block px-6 transition-colors"
+                      ? "block rounded px-6 bg-slate-700 transition-colors"
+                      : "block px-6 transition-colors"
                   }
                   to={`/notes/${note.id}`}
                 >
