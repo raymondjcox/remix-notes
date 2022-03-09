@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import config from "~/config";
 
 interface Props {
   signedIn: ({ credential }: { credential: string }) => void;
@@ -22,7 +23,7 @@ export default function GoogleSignInButton({ signedIn }: Props) {
     <>
       <div
         id="g_id_onload"
-        data-client_id="619781818658-saf14vdg9e70nn652ueisfdqe08n531a.apps.googleusercontent.com"
+        data-client_id={config.CLIENT_ID}
         data-auto_prompt="false"
         data-callback="handleToken"
       ></div>

@@ -1,21 +1,33 @@
-// app/sessions.js
-import { createCookieSessionStorage } from "remix";
+import { createCookieSessionStorage, redirect } from "remix";
 
-const { getSession, commitSession, destroySession } =
-  createCookieSessionStorage({
-    // a Cookie from `createCookie` or the CookieOptions to create one
-    cookie: {
-      name: "__session",
-      // all of these are optional
-      domain: "localhost",
-      expires: new Date(Date.now() + 60_000 * 60 * 24),
-      httpOnly: true,
-      maxAge: 60 * 60 * 24,
-      path: "/",
-      sameSite: "strict",
-      secrets: ["s3cret1"],
-      secure: true,
+const storage = createCookieSessionStorage({
+  cookie: {
+    name: "__session",
+    // all of these are optional
+    domain: "localhost",
+    expires: new Date(Date.now() + 60_000 * 60 * 24),
+    httpOnly: true,
+    maxAge: 60 * 60 * 24,
+    path: "/",
+    sameSite: "strict",
+    secrets: [process.env.SESSION_SECRET ?? ""],
+    secure: true,
+  },
+});
+
+export async function createUserSession(userId: string, redirectTo: string) {
+  const session = await storage.getSession();
+
+  session.set("userId", userId);
+  return redirect(redirectTo, {
+    headers: {
+      "Set-Cookie": await storage.commitSession(session),
     },
   });
+}
 
-export { getSession, commitSession, destroySession };
+export function getSession(request: any) {
+  return storage.getSession(request.headers.get("Cookie"));
+}
+
+export const commitSession = storage.commitSession;

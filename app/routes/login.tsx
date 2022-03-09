@@ -1,15 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { Form, useSubmit, redirect, json, useLoaderData } from "remix";
 import GoogleSignInButton from "~/components/GoogleSignInButton";
-import { getSession, commitSession } from "~/sessions";
+import { commitSession, createUserSession, getSession } from "~/sessions";
 import { authenticate } from "~/auth";
 
 export async function loader({ request }) {
-  const session = await getSession(request.headers.get("Cookie"));
+  const session = await getSession(request);
 
   if (session.has("userId")) {
-    // Redirect to the home page if they are already signed in.
-    return redirect("/");
+    return redirect("/notes");
   }
 
   const data = { error: session.get("error") };
@@ -22,19 +21,13 @@ export async function loader({ request }) {
 }
 
 export async function action({ request }) {
-  const session = await getSession(request.headers.get("Cookie"));
+  const session = await getSession(request);
 
   const formData = await request.formData();
 
   try {
     const email = await authenticate(formData.get("id"));
-    session.set("userId", email);
-
-    return redirect("/notes", {
-      headers: {
-        "Set-Cookie": await commitSession(session),
-      },
-    });
+    return await createUserSession(email ?? "", "/notes");
   } catch (err) {
     session.flash("error", "Unable to login");
     return redirect("/login", {

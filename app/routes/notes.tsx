@@ -10,13 +10,18 @@ import {
 import { DocumentAddIcon, TrashIcon, SunIcon } from "@heroicons/react/outline";
 import type { LoaderFunction } from "remix";
 import { db } from "~/utils/db.server";
+import { unauthorized } from "~/auth";
 
 interface ReturnedNote extends Pick<Note, "id" | "title" | "content"> {
   createdAt: string;
   updatedAt?: string;
 }
 
-export let loader: LoaderFunction = async ({ params }) => {
+export let loader: LoaderFunction = async ({ request }) => {
+  if (await unauthorized(request)) {
+    return redirect("/login");
+  }
+
   const notes = await db.note.findMany({
     orderBy: {
       updatedAt: "desc",
@@ -37,6 +42,10 @@ export let loader: LoaderFunction = async ({ params }) => {
 };
 
 export async function action({ request }) {
+  if (await unauthorized(request)) {
+    return redirect("/login");
+  }
+
   const formData = await request.formData();
   const noteId = formData.get("noteId");
 

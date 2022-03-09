@@ -4,8 +4,13 @@ import { Form, useSubmit, redirect, useLoaderData } from "remix";
 import type { LoaderFunction } from "remix";
 import { db } from "~/utils/db.server";
 import { useMemo, useEffect, useRef } from "react";
+import { unauthorized } from "~/auth";
 
-export let loader: LoaderFunction = async ({ params }) => {
+export let loader: LoaderFunction = async ({ request, params }) => {
+  if (await unauthorized(request)) {
+    return redirect("/login");
+  }
+
   if (!params.id) {
     throw "No id";
   }
@@ -17,8 +22,11 @@ export let loader: LoaderFunction = async ({ params }) => {
 };
 
 export async function action({ request }) {
-  const formData = await request.formData();
+  if (await unauthorized(request)) {
+    return redirect("/login");
+  }
 
+  const formData = await request.formData();
   await db.note.update({
     where: {
       id: +formData.get("noteId"),
