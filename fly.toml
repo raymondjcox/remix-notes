@@ -7,6 +7,7 @@ kill_timeout = 5
 processes = []
 
 [env]
+  DOMAIN = "summer-dream-5405.fly.dev"
 
 [experimental]
   allowed_public_ports = []
