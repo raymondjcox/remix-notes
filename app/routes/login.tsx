@@ -47,7 +47,7 @@ export async function action({ request }) {
 
 export default function Login() {
   const submit = useSubmit();
-  const { currentUser, error } = useLoaderData();
+  const { error } = useLoaderData();
 
   const ref = useRef<HTMLFormElement | null>(null);
   const [id, setId] = useState("");
@@ -68,6 +68,7 @@ export default function Login() {
         <h1 className="text-lg">Log in to Notes</h1>
         <input name="id" type="hidden" value={id} />
         <GoogleSignInButton signedIn={({ credential }) => setId(credential)} />
+        <div className="text-xs text-red-500">{error}</div>
       </Form>
     </div>
   );
