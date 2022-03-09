@@ -76,7 +76,7 @@ function HeaderMenu() {
   const transition = useTransition();
 
   return (
-    <div className="bg-slate-900 text-slate-500 border-b border-slate-800 flex align-items justify-between pt-2 pb-2 px-8 gap-4">
+    <div className="bg-slate-900 border-b border-slate-800 flex align-items justify-between pt-2 pb-2 px-8 gap-4">
       <Form className="flex align-items gap-4" method="post">
         <input type="hidden" name="noteId" value={noteId ?? 0} />
         <button
@@ -137,7 +137,7 @@ export default function Index() {
   return (
     <div className="text-slate-400 h-screen flex flex-col">
       <HeaderMenu />
-      <div className="text-slate-300 bg-slate-900 flex h-full min-h-0 ">
+      <div className="text-slate-200 bg-slate-900 flex h-full min-h-0 ">
         <div className="overflow-auto flex-initial basis-3/12 h-full border-r border-slate-800">
           <ul className="overflow-auto mx-3 mt-3 ">
             {notes.map((note) => (
