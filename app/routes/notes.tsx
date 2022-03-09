@@ -8,7 +8,7 @@ import {
   useParams,
   useTransition,
 } from "remix";
-import { DocumentAddIcon, TrashIcon, SunIcon } from "@heroicons/react/outline";
+import { DocumentAddIcon, TrashIcon, MoonIcon } from "@heroicons/react/outline";
 import type { LoaderFunction } from "remix";
 import { db } from "~/utils/db.server";
 import { unauthorized } from "~/auth";
@@ -98,7 +98,10 @@ function HeaderMenu() {
           </button>
         )}
       </Form>
-      <SunIcon className="h-5 w-5 cursor-pointer pointer-events-none" />
+      <div className="flex items-center gap-4 text-slate-300">
+        <MoonIcon className="h-5 w-5 stroke-cyan-500 cursor-pointer pointer-events-none" />
+        <div>Your user</div>
+      </div>
     </div>
   );
 }
