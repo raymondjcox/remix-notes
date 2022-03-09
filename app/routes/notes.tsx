@@ -80,7 +80,7 @@ function HeaderMenu() {
       <Form className="flex align-items gap-4" method="post">
         <input type="hidden" name="noteId" value={noteId ?? 0} />
         <button
-          disabled={transition.state === "submitting"}
+          disabled={!!transition.submission}
           type="submit"
           name="_action"
           value="create"
@@ -89,7 +89,7 @@ function HeaderMenu() {
         </button>
         {noteId && (
           <button
-            disabled={transition.state === "submitting"}
+            disabled={!!transition.submission}
             type="submit"
             name="_action"
             value="delete"
