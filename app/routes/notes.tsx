@@ -6,6 +6,7 @@ import {
   redirect,
   Outlet,
   useParams,
+  useTransition,
 } from "remix";
 import { DocumentAddIcon, TrashIcon, SunIcon } from "@heroicons/react/outline";
 import type { LoaderFunction } from "remix";
@@ -72,15 +73,27 @@ export async function action({ request }) {
 
 function HeaderMenu() {
   const { id: noteId } = useParams();
+  const transition = useTransition();
+
   return (
     <div className="bg-slate-900 text-slate-500 border-b border-slate-800 flex align-items justify-between pt-2 pb-2 px-8 gap-4">
       <Form className="flex align-items gap-4" method="post">
         <input type="hidden" name="noteId" value={noteId ?? 0} />
-        <button type="submit" name="_action" value="create">
+        <button
+          disabled={transition.state === "submitting"}
+          type="submit"
+          name="_action"
+          value="create"
+        >
           <DocumentAddIcon className="h-5 w-5 cursor-pointer pointer-events-none" />
         </button>
         {noteId && (
-          <button type="submit" name="_action" value="delete">
+          <button
+            disabled={transition.state === "submitting"}
+            type="submit"
+            name="_action"
+            value="delete"
+          >
             <TrashIcon className="h-5 w-5 cursor-pointer pointer-events-none" />
           </button>
         )}
