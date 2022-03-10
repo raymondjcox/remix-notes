@@ -172,7 +172,7 @@ function HeaderMenu() {
           >
             <div className="text-md">{currentUser.firstName}</div>
             <ChevronDownIcon
-              className={`h-4 w-4 transition-all ease-in-out ${
+              className={`h-4 w-4 transition-transform ease-in-out ${
                 dropdownOpen && "rotate-180"
               }`}
             />
