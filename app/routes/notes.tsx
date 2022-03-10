@@ -131,36 +131,36 @@ function HeaderMenu() {
         {noteId && <input type="hidden" name="noteId" value={noteId} />}
         <button
           disabled={!!transition.submission}
-          className="group"
+          className="group rounded px-1 hover:bg-green-100 dark:hover:bg-green-800"
           type="submit"
           name="_action"
           value="create"
         >
-          <DocumentAddIcon className="h-5 w-5 pointer-events-none group-hover:stroke-green-400" />
+          <DocumentAddIcon className="h-5 w-5 pointer-events-none group-hover:stroke-green-600 dark:group-hover:stroke-green-200" />
         </button>
         {noteId && (
           <button
             disabled={!!transition.submission}
-            className="group"
+            className="group px-1 hover:bg-red-100 rounded dark:hover:bg-red-800"
             type="submit"
             name="_action"
             value="delete"
           >
-            <TrashIcon className="h-5 w-5 pointer-events-none group-hover:stroke-red-400" />
+            <TrashIcon className="h-5 w-5 pointer-events-none group-hover:stroke-red-600 dark:group-hover:stroke-red-200" />
           </button>
         )}
       </Form>
       <div className="flex items-center gap-4 dark:text-slate-300">
         {mode === "dark" && (
           <MoonIcon
-            className="h-5 w-5 stroke-cyan-600 cursor-pointer"
+            className="h-7 w-7 px-1 stroke-cyan-600 cursor-pointer rounded dark:hover:bg-cyan-900  dark:hover:stroke-cyan-200"
             onClick={toggleColorMode}
           />
         )}
 
         {mode === "light" && (
           <SunIcon
-            className="h-5 w-5 stroke-cyan-600 cursor-pointer"
+            className="h-7 w-7 px-1 stroke-cyan-600 cursor-pointer rounded hover:bg-cyan-100 hover:stroke-cyan-800"
             onClick={toggleColorMode}
           />
         )}

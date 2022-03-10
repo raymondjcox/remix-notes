@@ -9,7 +9,7 @@ export const clientThemeCode = ` (() => {
 })()
 `;
 
-export function useColorMode() {
+export function useColorMode(): [string, () => void] {
   const [mode, setMode] = useState(() => {
     if (typeof window === "undefined") {
       return "";
