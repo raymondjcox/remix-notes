@@ -86,7 +86,6 @@ export async function action({ request }) {
 
   if (formData.get("_action") === "signOut") {
     const session = await getSession(request);
-    console.log("WE HERE");
     return redirect("/login", {
       headers: {
         "Set-Cookie": await destroySession(session),
