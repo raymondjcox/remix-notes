@@ -17,19 +17,24 @@ import {
 } from "@heroicons/react/outline";
 import type { LoaderFunction } from "remix";
 import { db } from "~/utils/db.server";
-import { unauthorized } from "~/auth";
+import { findCurrentUser, unauthorized } from "~/auth";
 import { useColorMode } from "~/theme";
-import { getSession } from "~/sessions";
 
 interface ReturnedNote extends Pick<Note, "id" | "title" | "content"> {
   createdAt: string;
   updatedAt?: string;
 }
 
+interface DataLoaderResponse {
+  notes: ReturnedNote[];
+  currentUser: User;
+}
+
 export let loader: LoaderFunction = async ({ request }) => {
   if (await unauthorized(request)) {
     return redirect("/login");
   }
+  const currentUser = await findCurrentUser(request);
 
   const notes = await db.note.findMany({
     orderBy: {
@@ -42,14 +47,11 @@ export let loader: LoaderFunction = async ({ request }) => {
       createdAt: true,
       content: false,
     },
-  });
-
-  const session = await getSession(request);
-  const currentUser = await db.user.findFirst({
     where: {
-      id: +session.get("userId"),
+      authorId: currentUser?.id,
     },
   });
+
   return {
     notes: notes.map((note) => ({
       ...note,
@@ -66,13 +68,15 @@ export async function action({ request }) {
   }
 
   const formData = await request.formData();
+  const currentUser = await findCurrentUser(request);
   const noteId = formData.get("noteId");
 
-  if (formData.get("_action") === "create") {
+  if (formData.get("_action") === "create" && currentUser) {
     const newNote = await db.note.create({
       data: {
         title: "Empty note",
         content: "",
+        authorId: currentUser.id,
       },
     });
     return redirect(`/notes/${newNote.id}`);
@@ -90,7 +94,7 @@ export async function action({ request }) {
 }
 
 function HeaderMenu() {
-  const { currentUser } = useLoaderData<{ currentUser: User }>();
+  const { currentUser } = useLoaderData<DataLoaderResponse>();
   const [mode, toggleColorMode] = useColorMode();
   const { id: noteId } = useParams();
   const transition = useTransition();
@@ -173,7 +177,7 @@ const formatDate = (date: string): string => {
 };
 
 export default function Index() {
-  const { notes } = useLoaderData<{ notes: ReturnedNote[] }>();
+  const { notes } = useLoaderData<DataLoaderResponse>();
 
   return (
     <div className="dark:text-slate-400 h-screen flex flex-col">

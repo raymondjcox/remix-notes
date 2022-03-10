@@ -21,6 +21,15 @@ export async function unauthorized(request: any) {
   return !session.has("userId");
 }
 
+export async function findCurrentUser(request: Request) {
+  const session = await getSession(request);
+  return db.user.findFirst({
+    where: {
+      id: +session.get("userId"),
+    },
+  });
+}
+
 export function findUserByEmail(email: string) {
   return db.user.findFirst({
     where: {
