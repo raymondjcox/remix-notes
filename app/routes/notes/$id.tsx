@@ -41,11 +41,19 @@ export async function action({ request }) {
 
 export default function Index() {
   const submit = useSubmit();
-  const ref = useRef<HTMLFormElement | null>(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const note = useLoaderData<Note>();
 
   useEffect(() => {
-    ref.current?.reset();
+    formRef.current?.reset();
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+      textareaRef.current.selectionStart =
+        textareaRef.current?.defaultValue.length;
+      textareaRef.current.selectionEnd =
+        textareaRef.current.defaultValue.length;
+    }
   }, [note.id]);
 
   function handleChange(form: HTMLFormElement) {
@@ -59,13 +67,15 @@ export default function Index() {
 
   return (
     <Form
-      ref={ref}
+      ref={formRef}
       method="post"
       className="flex flex-col h-full"
       onChange={(e) => debouncedHandleChange(e.currentTarget)}
     >
       <input type="hidden" name="noteId" value={note.id} />
       <textarea
+        //onFocus={(e) =>
+        ref={textareaRef}
         name="content"
         defaultValue={note.content}
         className="selection:bg-emerald-300 selection:text-emerald-900 h-full dark:bg-slate-900 p-2 resize-none outline-none"
