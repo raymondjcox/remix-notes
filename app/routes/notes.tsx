@@ -19,6 +19,8 @@ import type { LoaderFunction } from "remix";
 import { db } from "~/utils/db.server";
 import { findCurrentUser, unauthorized } from "~/auth";
 import { useColorMode } from "~/theme";
+import { useEffect, useState } from "react";
+import { getSession, destroySession } from "~/sessions";
 
 interface ReturnedNote extends Pick<Note, "id" | "title" | "content"> {
   createdAt: string;
@@ -82,6 +84,16 @@ export async function action({ request }) {
     return redirect(`/notes/${newNote.id}`);
   }
 
+  if (formData.get("_action") === "signOut") {
+    const session = await getSession(request);
+    console.log("WE HERE");
+    return redirect("/login", {
+      headers: {
+        "Set-Cookie": await destroySession(session),
+      },
+    });
+  }
+
   if (formData.get("_action") === "delete" && noteId) {
     await db.note.delete({
       where: {
@@ -96,13 +108,28 @@ export async function action({ request }) {
 function HeaderMenu() {
   const { currentUser } = useLoaderData<DataLoaderResponse>();
   const [mode, toggleColorMode] = useColorMode();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const { id: noteId } = useParams();
   const transition = useTransition();
+
+  useEffect(() => {
+    const listener = () => {
+      setDropdownOpen(false);
+    };
+
+    if (dropdownOpen) {
+      document.addEventListener("click", listener);
+    }
+
+    return () => {
+      document.removeEventListener("click", listener);
+    };
+  }, [dropdownOpen]);
 
   return (
     <div className="bg-white dark:bg-slate-900 dark:border-slate-800 border-b flex align-items justify-between pt-2 pb-2 px-8 gap-4">
       <Form className="flex align-items gap-4" method="post">
-        <input type="hidden" name="noteId" value={noteId ?? 0} />
+        {noteId && <input type="hidden" name="noteId" value={noteId} />}
         <button
           disabled={!!transition.submission}
           className="group"
@@ -139,9 +166,28 @@ function HeaderMenu() {
           />
         )}
         <></>
-        <div className="flex items-center gap-1 cursor-pointer select-none">
-          <div className="text-md">{currentUser.firstName}</div>
-          <ChevronDownIcon className="h-4 w-4" />
+        <div className="relative">
+          <div
+            className="flex items-center gap-1 cursor-pointer select-none"
+            onClick={() => setDropdownOpen(true)}
+          >
+            <div className="text-md">{currentUser.firstName}</div>
+            <ChevronDownIcon
+              className={`h-4 w-4 transition-all ease-in-out ${
+                dropdownOpen && "rotate-180"
+              }`}
+            />
+          </div>
+          <Form
+            method="post"
+            className={`transition-opacity ease-in-out absolute cursor-pointer rounded shadow bg-white dark:bg-slate-800 border dark:border-slate-700 px-2 py-2 right-0 text-sm ${
+              dropdownOpen ? "visible opacity-100" : "invisible opacity-0"
+            }`}
+          >
+            <button type="submit" name="_action" value="signOut">
+              Sign out
+            </button>
+          </Form>
         </div>
       </div>
     </div>

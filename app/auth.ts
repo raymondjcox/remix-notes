@@ -2,7 +2,7 @@ import { User } from "@prisma/client";
 import { db } from "~/utils/db.server";
 import { OAuth2Client } from "google-auth-library";
 import config from "~/config";
-import { getSession } from "./sessions";
+import { getSession, destroySession } from "./sessions";
 
 export async function authenticate(idToken: string) {
   const client = new OAuth2Client(config.CLIENT_ID);
@@ -16,7 +16,7 @@ export async function authenticate(idToken: string) {
   return payload;
 }
 
-export async function unauthorized(request: any) {
+export async function unauthorized(request: Request) {
   const session = await getSession(request);
   return !session.has("userId");
 }

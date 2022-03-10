@@ -31,3 +31,4 @@ export function getSession(request: any) {
 }
 
 export const commitSession = storage.commitSession;
+export const destroySession = storage.destroySession;
