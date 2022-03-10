@@ -68,7 +68,7 @@ export default function Index() {
       <textarea
         name="content"
         defaultValue={note.content}
-        className="selection:bg-green-800 h-full bg-slate-900 p-2 resize-none outline-none"
+        className="selection:bg-emerald-300 selection:text-emerald-900 h-full dark:bg-slate-900 p-2 resize-none outline-none"
         placeholder="enter note here"
       />
     </Form>

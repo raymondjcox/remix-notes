@@ -1,4 +1,5 @@
 import styles from "./styles/app.css";
+import { clientThemeCode, ThemeContext } from "./theme";
 
 import {
   Links,
@@ -26,6 +27,7 @@ export default function App() {
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <Meta />
         <Links />
+        <script dangerouslySetInnerHTML={{ __html: clientThemeCode }} />
       </head>
       <body>
         <Outlet />
