@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Form, useSubmit, redirect, json, useLoaderData } from "remix";
 import GoogleSignInButton from "~/components/GoogleSignInButton";
 import { commitSession, createUserSession, getSession } from "~/sessions";
-import { authenticate } from "~/auth";
+import { authenticate, findOrCreateUser } from "~/auth";
 
 export async function loader({ request }) {
   const session = await getSession(request);
@@ -26,8 +26,21 @@ export async function action({ request }) {
   const formData = await request.formData();
 
   try {
-    const email = await authenticate(formData.get("id"));
-    return await createUserSession(email ?? "", "/notes");
+    const userId = await authenticate(formData.get("id"));
+    if (!userId) {
+      throw "Empty payload";
+    }
+
+    if (!userId.email) {
+      throw "No user email";
+    }
+
+    const user = await findOrCreateUser({
+      firstName: userId.given_name ?? "",
+      lastName: userId.family_name ?? "",
+      email: userId.email,
+    });
+    return await createUserSession(`${user.id}`, "/notes");
   } catch (err) {
     session.flash("error", "Unable to login");
     return redirect("/login", {

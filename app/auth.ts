@@ -1,3 +1,5 @@
+import { User } from "@prisma/client";
+import { db } from "~/utils/db.server";
 import { OAuth2Client } from "google-auth-library";
 import config from "~/config";
 import { getSession } from "./sessions";
@@ -10,10 +12,35 @@ export async function authenticate(idToken: string) {
     audience: config.CLIENT_ID,
   });
   const payload = ticket.getPayload();
-  return payload?.["email"];
+  console.log(payload);
+  return payload;
 }
 
 export async function unauthorized(request: any) {
   const session = await getSession(request);
   return !session.has("userId");
+}
+
+export function findUserByEmail(email: string) {
+  return db.user.findFirst({
+    where: {
+      email,
+    },
+  });
+}
+
+type PartialUser = Pick<User, "email" | "firstName" | "lastName">;
+
+export function createUser(user: PartialUser) {
+  return db.user.create({
+    data: {
+      ...user,
+    },
+  });
+}
+
+export async function findOrCreateUser(user: PartialUser): Promise<User> {
+  const { email } = user;
+  const maybeUser = await findUserByEmail(email);
+  return maybeUser ? maybeUser : createUser(user);
 }

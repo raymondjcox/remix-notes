@@ -1,4 +1,4 @@
-import { Note } from "@prisma/client";
+import { Note, User } from "@prisma/client";
 import {
   NavLink,
   Form,
@@ -19,6 +19,7 @@ import type { LoaderFunction } from "remix";
 import { db } from "~/utils/db.server";
 import { unauthorized } from "~/auth";
 import { useColorMode } from "~/theme";
+import { getSession } from "~/sessions";
 
 interface ReturnedNote extends Pick<Note, "id" | "title" | "content"> {
   createdAt: string;
@@ -42,11 +43,21 @@ export let loader: LoaderFunction = async ({ request }) => {
       content: false,
     },
   });
-  return notes.map((note) => ({
-    ...note,
-    updatedAt: note?.updatedAt?.toUTCString(),
-    createdAt: note.createdAt.toUTCString(),
-  }));
+
+  const session = await getSession(request);
+  const currentUser = await db.user.findFirst({
+    where: {
+      id: +session.get("userId"),
+    },
+  });
+  return {
+    notes: notes.map((note) => ({
+      ...note,
+      updatedAt: note?.updatedAt?.toUTCString(),
+      createdAt: note.createdAt.toUTCString(),
+    })),
+    currentUser: currentUser,
+  };
 };
 
 export async function action({ request }) {
@@ -79,6 +90,7 @@ export async function action({ request }) {
 }
 
 function HeaderMenu() {
+  const { currentUser } = useLoaderData<{ currentUser: User }>();
   const [mode, toggleColorMode] = useColorMode();
   const { id: noteId } = useParams();
   const transition = useTransition();
@@ -124,7 +136,7 @@ function HeaderMenu() {
         )}
         <></>
         <div className="flex items-center gap-1 cursor-pointer select-none">
-          <div className="text-md">Raymond</div>
+          <div className="text-md">{currentUser.firstName}</div>
           <ChevronDownIcon className="h-4 w-4" />
         </div>
       </div>
@@ -161,7 +173,7 @@ const formatDate = (date: string): string => {
 };
 
 export default function Index() {
-  const notes = useLoaderData<ReturnedNote[]>();
+  const { notes } = useLoaderData<{ notes: ReturnedNote[] }>();
 
   return (
     <div className="dark:text-slate-400 h-screen flex flex-col">
