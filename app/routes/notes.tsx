@@ -167,7 +167,7 @@ function HeaderMenu() {
         <></>
         <div className="relative">
           <div
-            className={`flex items-center gap-1 p-1 rounded cursor-pointer select-none`}
+            className={`flex items-center gap-1 px-2 py-1 rounded cursor-pointer select-none hover:bg-slate-100 dark:hover:bg-slate-800`}
             onClick={() => setDropdownOpen(true)}
           >
             <div className="text-md">{currentUser.firstName}</div>
@@ -179,11 +179,16 @@ function HeaderMenu() {
           </div>
           <Form
             method="post"
-            className={`transition-opacity ease-in-out absolute cursor-pointer rounded shadow w-full bg-white dark:bg-slate-800 border dark:border-slate-700 px-2 py-2 left-0 width-100 text-sm ${
+            className={`transition-opacity ease-in-out absolute cursor-pointer rounded shadow w-full bg-white dark:bg-slate-800 border dark:border-slate-700 left-0 width-100 text-sm ${
               dropdownOpen ? "visible opacity-100" : "invisible opacity-0"
             }`}
           >
-            <button type="submit" name="_action" value="signOut">
+            <button
+              className="hover:bg-red-100 hover:text-red-900 w-full p-2 rounded dark:hover:bg-red-300 text-left"
+              type="submit"
+              name="_action"
+              value="signOut"
+            >
               Sign out
             </button>
           </Form>
