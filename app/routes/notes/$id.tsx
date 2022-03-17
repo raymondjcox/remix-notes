@@ -4,19 +4,31 @@ import { Form, useSubmit, redirect, useLoaderData } from "remix";
 import type { LoaderFunction } from "remix";
 import { db } from "~/utils/db.server";
 import { useMemo, useEffect, useRef } from "react";
-import { unauthorized } from "~/auth";
+import { unauthorized, findCurrentUser } from "~/auth";
 
 export let loader: LoaderFunction = async ({ request, params }) => {
-  if (await unauthorized(request)) {
+  const currentUser = await findCurrentUser(request);
+
+  if (!currentUser) {
     return redirect("/login");
   }
 
   if (!params.id) {
     throw "No id";
   }
+
+  const note = await db.note.findFirst({
+    where: {
+      id: +params.id,
+      authorId: +currentUser?.id,
+    },
+  });
+  console.log(note);
+
   return db.note.findFirst({
     where: {
       id: +params.id,
+      authorId: +currentUser?.id,
     },
   });
 };
@@ -43,7 +55,7 @@ export default function Index() {
   const submit = useSubmit();
   const formRef = useRef<HTMLFormElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const note = useLoaderData<Note>();
+  const note = useLoaderData<Note | null>();
 
   useEffect(() => {
     formRef.current?.reset();
@@ -54,7 +66,7 @@ export default function Index() {
       textareaRef.current.selectionEnd =
         textareaRef.current.defaultValue.length;
     }
-  }, [note.id]);
+  }, [note?.id]);
 
   function handleChange(form: HTMLFormElement) {
     submit(form, { replace: true });
@@ -64,6 +76,13 @@ export default function Index() {
     () => debounce((form: HTMLFormElement) => handleChange(form), 1000),
     []
   );
+  if (!note) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full w-full">
+        <div className="text-2xl font-bold text-red-500">Note not found</div>
+      </div>
+    );
+  }
 
   return (
     <Form

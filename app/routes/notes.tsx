@@ -33,10 +33,11 @@ interface DataLoaderResponse {
 }
 
 export let loader: LoaderFunction = async ({ request }) => {
-  if (await unauthorized(request)) {
+  const currentUser = await findCurrentUser(request);
+
+  if (!currentUser) {
     return redirect("/login");
   }
-  const currentUser = await findCurrentUser(request);
 
   const notes = await db.note.findMany({
     orderBy: {
@@ -232,7 +233,7 @@ export default function Index() {
   return (
     <div className="dark:text-slate-400 h-screen flex flex-col">
       <HeaderMenu />
-      <div className="dark:text-slate-200 dark:bg-slate-900 flex-col sm:flex-row flex h-full min-h-0 ">
+      <div className="dark:text-slate-200 dark:bg-slate-900 flex-col-reverse sm:flex-row flex h-full min-h-0 ">
         <div className="overflow-auto flex-initial min-h-0 basis-1/3 sm:basis-3/12 h-full border-b sm:border-r dark:border-slate-800 min-w-0">
           <ul className="overflow-auto mx-3 mt-3 ">
             {notes.map((note) => (
