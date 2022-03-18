@@ -71,7 +71,7 @@ export default function Login() {
         className="flex flex-col items-center py-4 px-12 border gap-2"
         method="post"
       >
-        <h1 className="text-lg">Log in to Notes</h1>
+        <h1 className="text-lg">Sign in to Notes</h1>
         <input name="id" type="hidden" value={id} />
         <GoogleSignInButton signedIn={({ credential }) => setId(credential)} />
         <div className="text-xs text-red-500">{error}</div>

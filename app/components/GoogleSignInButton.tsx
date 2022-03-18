@@ -28,12 +28,12 @@ export default function GoogleSignInButton({ signedIn }: Props) {
         data-callback="handleToken"
       ></div>
       <div
-        className="g_id_signin"
+        className="g_id_signin h-8"
         data-type="standard"
-        data-size="large"
+        data-size="medium"
         data-theme="outline"
         data-text="sign_in_with"
-        data-shape="rectangular"
+        data-shape="pill"
         data-logo_alignment="left"
       ></div>
     </>
