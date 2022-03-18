@@ -23,25 +23,23 @@ export let loader: LoaderFunction = async ({ request, params }) => {
       authorId: +currentUser?.id,
     },
   });
-  console.log(note);
 
-  return db.note.findFirst({
-    where: {
-      id: +params.id,
-      authorId: +currentUser?.id,
-    },
-  });
+  return note;
 };
 
 export async function action({ request }) {
-  if (await unauthorized(request)) {
+  const currentUser = await findCurrentUser(request);
+
+  if (!currentUser) {
     return redirect("/login");
   }
 
   const formData = await request.formData();
-  await db.note.update({
+
+  await db.note.updateMany({
     where: {
       id: +formData.get("noteId"),
+      authorId: +currentUser?.id,
     },
     data: {
       title: formData.get("content")?.split("\n")?.[0] ?? "No title",
