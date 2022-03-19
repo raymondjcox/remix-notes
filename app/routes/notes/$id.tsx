@@ -92,7 +92,6 @@ export default function Index() {
     >
       <input type="hidden" name="noteId" value={note.id} />
       <textarea
-        //onFocus={(e) =>
         ref={textareaRef}
         name="content"
         defaultValue={note.content}
