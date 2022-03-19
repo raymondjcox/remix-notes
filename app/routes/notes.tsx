@@ -227,7 +227,7 @@ export default function Index() {
   const { notes } = useLoaderData<DataLoaderResponse>();
 
   return (
-    <div className="dark:text-slate-400 h-screen h-screen-ios flex flex-col">
+    <div className="dark:text-slate-400 h-screen flex flex-col">
       <HeaderMenu />
       <div className="dark:text-slate-200 dark:bg-slate-900 flex-col-reverse sm:flex-row flex h-full min-h-0 ">
         <div className="overflow-auto flex-initial min-h-0 basis-1/3 sm:basis-3/12 h-full border-b sm:border-r dark:border-slate-800 min-w-0">
