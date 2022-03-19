@@ -65,7 +65,7 @@ export default function Login() {
   }, [id]);
 
   return (
-    <div className="flex h-screen w-screen items-center justify-center">
+    <div className="flex h-screen h-screen-ios w-screen items-center justify-center">
       <Form
         ref={ref}
         className="flex flex-col items-center py-4 px-12 border gap-2"
