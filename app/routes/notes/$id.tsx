@@ -1,52 +1,53 @@
 import { Note } from "@prisma/client";
 import { debounce } from "lodash";
-import { Form, useSubmit, redirect, useLoaderData } from "remix";
+import { Form, useSubmit, useLoaderData } from "remix";
 import type { LoaderFunction } from "remix";
 import { db } from "~/utils/db.server";
 import { useMemo, useEffect, useRef } from "react";
-import { unauthorized, findCurrentUser } from "~/auth";
+import { findCurrentUser, requireUserSession } from "~/auth";
 
 export let loader: LoaderFunction = async ({ request, params }) => {
-  const currentUser = await findCurrentUser(request);
+  return requireUserSession(request, async (session) => {
+    const currentUser = await findCurrentUser(session);
 
-  if (!currentUser) {
-    return redirect("/login");
-  }
+    if (!params.id) {
+      throw "No id";
+    }
 
-  if (!params.id) {
-    throw "No id";
-  }
+    const note = await db.note.findFirst({
+      where: {
+        id: +params.id,
+        authorId: +currentUser.id,
+      },
+    });
 
-  const note = await db.note.findFirst({
-    where: {
-      id: +params.id,
-      authorId: +currentUser?.id,
-    },
+    return note;
   });
-
-  return note;
 };
 
-export async function action({ request }) {
-  const currentUser = await findCurrentUser(request);
+export async function action({ request }: { request: Request }) {
+  return requireUserSession(request, async (session) => {
+    const currentUser = await findCurrentUser(session);
+    const formData = await request.formData();
+    const noteId = formData.get("noteId");
+    const content = formData.get("content") ?? "";
 
-  if (!currentUser) {
-    return redirect("/login");
-  }
+    if (!noteId) {
+      return null;
+    }
 
-  const formData = await request.formData();
-
-  await db.note.updateMany({
-    where: {
-      id: +formData.get("noteId"),
-      authorId: +currentUser?.id,
-    },
-    data: {
-      title: formData.get("content")?.split("\n")?.[0] ?? "No title",
-      content: formData.get("content") ?? "",
-    },
+    await db.note.updateMany({
+      where: {
+        id: +noteId,
+        authorId: +currentUser?.id,
+      },
+      data: {
+        title: String(content).split("\n")?.[0] ?? "No title",
+        content: String(content),
+      },
+    });
+    return null;
   });
-  return null;
 }
 
 export default function Index() {

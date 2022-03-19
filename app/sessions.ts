@@ -3,7 +3,6 @@ import { createCookieSessionStorage, redirect } from "remix";
 const storage = createCookieSessionStorage({
   cookie: {
     name: "__session",
-    // all of these are optional
     domain: process.env.DOMAIN,
     expires: new Date(Date.now() + 60_000 * 60 * 24),
     httpOnly: true,

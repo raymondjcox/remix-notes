@@ -17,7 +17,7 @@ import {
 } from "@heroicons/react/outline";
 import type { LoaderFunction } from "remix";
 import { db } from "~/utils/db.server";
-import { findCurrentUser, unauthorized } from "~/auth";
+import { findCurrentUser, requireUserSession } from "~/auth";
 import { useColorMode } from "~/theme";
 import { useEffect, useState } from "react";
 import { getSession, destroySession } from "~/sessions";
@@ -33,76 +33,72 @@ interface DataLoaderResponse {
 }
 
 export let loader: LoaderFunction = async ({ request }) => {
-  const currentUser = await findCurrentUser(request);
+  return requireUserSession(request, async (session) => {
+    const currentUser = await findCurrentUser(session);
 
-  if (!currentUser) {
-    return redirect("/login");
-  }
+    const notes = await db.note.findMany({
+      orderBy: {
+        updatedAt: "desc",
+      },
+      select: {
+        id: true,
+        title: true,
+        updatedAt: true,
+        createdAt: true,
+        content: false,
+      },
+      where: {
+        authorId: currentUser?.id,
+      },
+    });
 
-  const notes = await db.note.findMany({
-    orderBy: {
-      updatedAt: "desc",
-    },
-    select: {
-      id: true,
-      title: true,
-      updatedAt: true,
-      createdAt: true,
-      content: false,
-    },
-    where: {
-      authorId: currentUser?.id,
-    },
+    return {
+      notes: notes.map((note) => ({
+        ...note,
+        updatedAt: note?.updatedAt?.toUTCString(),
+        createdAt: note.createdAt.toUTCString(),
+      })),
+      currentUser: currentUser,
+    };
   });
-
-  return {
-    notes: notes.map((note) => ({
-      ...note,
-      updatedAt: note?.updatedAt?.toUTCString(),
-      createdAt: note.createdAt.toUTCString(),
-    })),
-    currentUser: currentUser,
-  };
 };
 
-export async function action({ request }) {
-  if (await unauthorized(request)) {
-    return redirect("/login");
-  }
+export async function action({ request }: { request: Request }) {
+  return requireUserSession(request, async (session) => {
+    const formData = await request.formData();
+    const currentUser = await findCurrentUser(session);
+    const noteId = formData.get("noteId");
 
-  const formData = await request.formData();
-  const currentUser = await findCurrentUser(request);
-  const noteId = formData.get("noteId");
+    if (formData.get("_action") === "create" && currentUser) {
+      const newNote = await db.note.create({
+        data: {
+          title: "Empty note",
+          content: "",
+          authorId: currentUser.id,
+        },
+      });
+      return redirect(`/notes/${newNote.id}`);
+    }
 
-  if (formData.get("_action") === "create" && currentUser) {
-    const newNote = await db.note.create({
-      data: {
-        title: "Empty note",
-        content: "",
-        authorId: currentUser.id,
-      },
-    });
-    return redirect(`/notes/${newNote.id}`);
-  }
+    if (formData.get("_action") === "signOut") {
+      const session = await getSession(request);
+      return redirect("/login", {
+        headers: {
+          "Set-Cookie": await destroySession(session),
+        },
+      });
+    }
 
-  if (formData.get("_action") === "signOut") {
-    const session = await getSession(request);
-    return redirect("/login", {
-      headers: {
-        "Set-Cookie": await destroySession(session),
-      },
-    });
-  }
+    if (formData.get("_action") === "delete" && noteId) {
+      await db.note.delete({
+        where: {
+          id: +noteId,
+        },
+      });
+    }
 
-  if (formData.get("_action") === "delete" && noteId) {
-    await db.note.delete({
-      where: {
-        id: +noteId,
-      },
-    });
-  }
-
-  return redirect(`/notes`);
+    return redirect(`/notes`);
+  });
 }
 
 function HeaderMenu() {

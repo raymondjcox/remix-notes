@@ -3,6 +3,7 @@ import { db } from "~/utils/db.server";
 import { OAuth2Client } from "google-auth-library";
 import config from "~/config";
 import { getSession } from "./sessions";
+import { Session, redirect } from "remix";
 
 export async function authenticate(idToken: string) {
   const client = new OAuth2Client(config.CLIENT_ID);
@@ -14,22 +15,34 @@ export async function authenticate(idToken: string) {
   return ticket.getPayload();
 }
 
-export async function unauthorized(request: Request) {
-  const session = await getSession(request);
-  return !session.has("userId");
-}
-
-export async function findCurrentUser(request: Request) {
-  const session = await getSession(request);
+export async function findCurrentUser(session: Session) {
   const id = session.get("userId");
-  if (!id) {
-    return null;
-  }
-  return db.user.findFirst({
+
+  const currentUser = await db.user.findFirst({
     where: {
       id: +id,
     },
   });
+
+  if (currentUser === null) {
+    throw "Unable to find current user (this should never happen)";
+  }
+
+  return currentUser;
+}
+
+export async function requireUserSession(
+  request: Request,
+  next: (session: Session) => any
+) {
+  const session = await getSession(request);
+  const id = session.get("userId");
+
+  if (!id) {
+    return redirect("/login");
+  } else {
+    return next(session);
+  }
 }
 
 export function findUserByEmail(email: string) {
