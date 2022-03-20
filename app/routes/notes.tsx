@@ -230,7 +230,7 @@ export default function Index() {
     <div className="dark:text-slate-400 h-screen flex flex-col">
       <HeaderMenu />
       <div className="dark:text-slate-200 dark:bg-slate-900 flex-col-reverse sm:flex-row flex h-full min-h-0 ">
-        <div className="overflow-auto flex-initial min-h-0 basis-1/3 sm:basis-3/12 h-full border-t sm:border-r dark:border-slate-800 min-w-0">
+        <div className="overflow-auto flex-initial min-h-0 basis-1/3 sm:basis-3/12 h-full border-t sm:border-t-0 sm:border-r dark:border-slate-800 min-w-0">
           <ul className="overflow-auto mx-3 mt-3 ">
             {notes.map((note) => (
               <li key={note.id}>
