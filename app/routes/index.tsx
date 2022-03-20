@@ -1,7 +1,8 @@
 import { Link, redirect } from "remix";
+import type { LoaderFunction } from "remix";
 import { getSession } from "~/sessions";
 
-export async function loader({ request }) {
+export let loader: LoaderFunction = async ({ request }) => {
   const session = await getSession(request);
 
   if (session.has("userId")) {
@@ -9,7 +10,7 @@ export async function loader({ request }) {
   } else {
     return redirect("/login");
   }
-}
+};
 
 export default function Index() {
   return <Link to="/notes">Read notes</Link>;

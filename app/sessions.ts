@@ -3,12 +3,11 @@ import { createCookieSessionStorage, redirect } from "remix";
 const storage = createCookieSessionStorage({
   cookie: {
     name: "__session",
-    domain: process.env.DOMAIN,
     expires: new Date(Date.now() + 60_000 * 60 * 24),
     httpOnly: true,
     maxAge: 60 * 60 * 24,
     path: "/",
-    sameSite: "strict",
+    sameSite: "lax",
     secrets: [process.env.SESSION_SECRET ?? ""],
     secure: true,
   },
@@ -25,7 +24,7 @@ export async function createUserSession(userId: string, redirectTo: string) {
   });
 }
 
-export function getSession(request: any) {
+export function getSession(request: Request) {
   return storage.getSession(request.headers.get("Cookie"));
 }
 
