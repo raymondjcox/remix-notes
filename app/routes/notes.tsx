@@ -162,7 +162,7 @@ function HeaderDropdown() {
         }`}
       >
         <button
-          className="hover:bg-red-100 hover:text-red-900 w-full p-2 rounded dark:hover:bg-red-300 text-left"
+          className="hover:bg-red-100 hover:text-red-900 w-full p-2 dark:hover:bg-red-300 text-left"
           type="submit"
           name="_action"
           value="signOut"
