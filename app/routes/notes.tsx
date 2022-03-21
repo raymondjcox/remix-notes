@@ -90,23 +90,43 @@ export async function action({ request }: { request: Request }) {
     }
 
     if (formData.get("_action") === "delete" && noteId) {
-      await db.note.delete({
+      const notes = await db.note.findMany({
+        orderBy: {
+          updatedAt: "desc",
+        },
+        select: {
+          id: true,
+        },
         where: {
-          id: +noteId,
+          authorId: currentUser.id,
         },
       });
+
+      const curNoteIndex = notes.findIndex((n) => n.id === +noteId);
+      const nextNoteId =
+        notes[curNoteIndex + 1]?.id ?? notes[curNoteIndex - 1]?.id;
+
+      await db.note.deleteMany({
+        where: {
+          id: +noteId,
+          authorId: currentUser.id,
+        },
+      });
+
+      if (nextNoteId === +noteId) {
+        return redirect("/notes");
+      }
+
+      return redirect(nextNoteId ? `/notes/${nextNoteId}` : "/notes");
     }
 
     return redirect(`/notes`);
   });
 }
 
-function HeaderMenu() {
+function HeaderDropdown() {
   const { currentUser } = useLoaderData<DataLoaderResponse>();
-  const [mode, toggleColorMode] = useColorMode();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const { id: noteId } = useParams();
-  const transition = useTransition();
 
   useEffect(() => {
     const listener = () => {
@@ -121,6 +141,43 @@ function HeaderMenu() {
       document.removeEventListener("click", listener);
     };
   }, [dropdownOpen]);
+
+  return (
+    <div className="relative">
+      <div
+        className={`flex items-center gap-1 px-2 py-1 rounded cursor-pointer select-none hover:bg-slate-100 dark:hover:bg-slate-800`}
+        onClick={() => setDropdownOpen(true)}
+      >
+        <div className="text-md">{currentUser.firstName}</div>
+        <ChevronDownIcon
+          className={`h-4 w-4 transition-transform ease-in-out ${
+            dropdownOpen && "rotate-180"
+          }`}
+        />
+      </div>
+      <Form
+        method="post"
+        className={`transition-opacity ease-in-out absolute cursor-pointer rounded shadow w-full bg-white dark:bg-slate-800 border dark:border-slate-700 left-0 width-100 text-sm ${
+          dropdownOpen ? "visible opacity-100" : "invisible opacity-0"
+        }`}
+      >
+        <button
+          className="hover:bg-red-100 hover:text-red-900 w-full p-2 rounded dark:hover:bg-red-300 text-left"
+          type="submit"
+          name="_action"
+          value="signOut"
+        >
+          Sign out
+        </button>
+      </Form>
+    </div>
+  );
+}
+
+function Header() {
+  const [mode, toggleColorMode] = useColorMode();
+  const { id: noteId } = useParams();
+  const transition = useTransition();
 
   return (
     <div className="bg-white dark:bg-slate-900 dark:border-slate-800 border-b flex align-items justify-between pt-2 pb-2 px-8 gap-4">
@@ -161,36 +218,40 @@ function HeaderMenu() {
             onClick={toggleColorMode}
           />
         )}
-        <></>
-        <div className="relative">
-          <div
-            className={`flex items-center gap-1 px-2 py-1 rounded cursor-pointer select-none hover:bg-slate-100 dark:hover:bg-slate-800`}
-            onClick={() => setDropdownOpen(true)}
-          >
-            <div className="text-md">{currentUser.firstName}</div>
-            <ChevronDownIcon
-              className={`h-4 w-4 transition-transform ease-in-out ${
-                dropdownOpen && "rotate-180"
-              }`}
-            />
-          </div>
-          <Form
-            method="post"
-            className={`transition-opacity ease-in-out absolute cursor-pointer rounded shadow w-full bg-white dark:bg-slate-800 border dark:border-slate-700 left-0 width-100 text-sm ${
-              dropdownOpen ? "visible opacity-100" : "invisible opacity-0"
-            }`}
-          >
-            <button
-              className="hover:bg-red-100 hover:text-red-900 w-full p-2 rounded dark:hover:bg-red-300 text-left"
-              type="submit"
-              name="_action"
-              value="signOut"
-            >
-              Sign out
-            </button>
-          </Form>
-        </div>
+        <HeaderDropdown />
       </div>
+    </div>
+  );
+}
+
+function NotesList() {
+  const { notes } = useLoaderData<DataLoaderResponse>();
+  return (
+    <div className="overflow-auto flex-initial min-h-0 basis-1/3 sm:basis-3/12 h-full border-t sm:border-t-0 sm:border-r dark:border-slate-800 min-w-0">
+      <ul className="overflow-auto mx-3 mt-3 ">
+        {notes.map((note) => (
+          <li key={note.id}>
+            <NavLink
+              className={({ isActive }) =>
+                isActive
+                  ? "block rounded px-6 bg-slate-200 dark:bg-slate-700"
+                  : "block px-6 "
+              }
+              to={`/notes/${note.id}`}
+            >
+              <div className="flex flex-col justify-center justify-items-center h-16 select-none">
+                <div className="min-w-0 overflow-ellipsis whitespace-nowrap overflow-hidden font-semibold text-sm">
+                  {note.title || "No content"}
+                </div>
+
+                <div className="min-w-0 overflow-ellipsis whitespace-nowrap overflow-hidden text-xs">
+                  {formatDate(note.updatedAt ?? note.createdAt)}
+                </div>
+              </div>
+            </NavLink>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -224,38 +285,11 @@ const formatDate = (date: string): string => {
 };
 
 export default function Index() {
-  const { notes } = useLoaderData<DataLoaderResponse>();
-
   return (
     <div className="dark:text-slate-400 h-screen flex flex-col">
-      <HeaderMenu />
+      <Header />
       <div className="dark:text-slate-200 dark:bg-slate-900 flex-col-reverse sm:flex-row flex h-full min-h-0 ">
-        <div className="overflow-auto flex-initial min-h-0 basis-1/3 sm:basis-3/12 h-full border-t sm:border-t-0 sm:border-r dark:border-slate-800 min-w-0">
-          <ul className="overflow-auto mx-3 mt-3 ">
-            {notes.map((note) => (
-              <li key={note.id}>
-                <NavLink
-                  className={({ isActive }) =>
-                    isActive
-                      ? "block rounded px-6 bg-slate-200 dark:bg-slate-700"
-                      : "block px-6 "
-                  }
-                  to={`/notes/${note.id}`}
-                >
-                  <div className="flex flex-col justify-center justify-items-center  h-16 select-none">
-                    <div className="min-w-0 overflow-ellipsis whitespace-nowrap overflow-hidden font-semibold text-sm">
-                      {note.title || "No content"}
-                    </div>
-
-                    <div className="min-w-0 overflow-ellipsis whitespace-nowrap overflow-hidden text-xs">
-                      {formatDate(note.updatedAt ?? note.createdAt)}
-                    </div>
-                  </div>
-                </NavLink>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <NotesList />
         <div className="flex-1">
           <Outlet />
         </div>
