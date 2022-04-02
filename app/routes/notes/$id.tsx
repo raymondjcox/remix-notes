@@ -86,7 +86,7 @@ export default function Index() {
         codeBlock: {
           HTMLAttributes: {
             class:
-              "bg-slate-700 dark:bg-slate-400 dark:text-slate-900 rounded text-white p-4 width-fit-content text-sm",
+              "bg-slate-700 dark:bg-slate-100 dark:text-slate-900 rounded text-white p-4 width-fit-content text-sm",
           },
         },
         document: false,
@@ -127,7 +127,7 @@ export default function Index() {
     <Form
       ref={formRef}
       method="post"
-      className="flex flex-col h-full"
+      className="flex flex-col h-full overflow-auto"
       onChange={(e) => debouncedHandleChange(e.currentTarget)}
     >
       <input type="hidden" name="noteId" value={note.id} />
