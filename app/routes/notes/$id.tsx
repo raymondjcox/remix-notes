@@ -67,28 +67,12 @@ export default function Index() {
     editorProps: {
       attributes: {
         class:
-          "selection:bg-emerald-300 selection:text-emerald-900 h-full dark:bg-slate-900 p-2 resize-none outline-none",
+          "prose prose-slate dark:prose-invert prose-sm selection:bg-emerald-300 selection:text-emerald-900 h-full p-2 resize-none outline-none",
       },
     },
     extensions: [
       CustomDocument,
       StarterKit.configure({
-        heading: {
-          HTMLAttributes: {
-            class: "text-2xl font-bold",
-          },
-        },
-        bulletList: {
-          HTMLAttributes: {
-            class: "list-disc mx-4",
-          },
-        },
-        codeBlock: {
-          HTMLAttributes: {
-            class:
-              "bg-slate-700 dark:bg-slate-100 dark:text-slate-900 rounded text-white p-4 width-fit-content text-sm",
-          },
-        },
         document: false,
       }),
     ],
