@@ -67,7 +67,7 @@ export default function Index() {
     editorProps: {
       attributes: {
         class:
-          "prose prose-slate dark:prose-invert prose-sm selection:bg-emerald-300 selection:text-emerald-900 h-full p-2 resize-none outline-none",
+          "prose prose-sm sm:prose lg:prose-lg prose-slate dark:prose-invert selection:bg-emerald-300 selection:text-emerald-900 h-full p-2 resize-none outline-none",
       },
     },
     extensions: [
