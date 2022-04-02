@@ -1,4 +1,7 @@
 import { Note } from "@prisma/client";
+import { useEditor, EditorContent } from "@tiptap/react";
+import Document from "@tiptap/extension-document";
+import StarterKit from "@tiptap/starter-kit";
 import { debounce } from "lodash";
 import { Form, useSubmit, useLoaderData } from "remix";
 import type { LoaderFunction } from "remix";
@@ -31,6 +34,7 @@ export async function action({ request }: { request: Request }) {
     const formData = await request.formData();
     const noteId = formData.get("noteId");
     const content = formData.get("content") ?? "";
+    const title = formData.get("title");
 
     if (!noteId) {
       return null;
@@ -42,7 +46,7 @@ export async function action({ request }: { request: Request }) {
         authorId: +currentUser?.id,
       },
       data: {
-        title: String(content).split("\n")?.[0] ?? "No title",
+        title: String(title),
         content: String(content),
       },
     });
@@ -50,21 +54,57 @@ export async function action({ request }: { request: Request }) {
   });
 }
 
+const CustomDocument = Document.extend({
+  content: "heading block*",
+});
+
 export default function Index() {
   const submit = useSubmit();
   const formRef = useRef<HTMLFormElement | null>(null);
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const note = useLoaderData<Note | null>();
+
+  const editor = useEditor({
+    editorProps: {
+      attributes: {
+        class:
+          "selection:bg-emerald-300 selection:text-emerald-900 h-full dark:bg-slate-900 p-2 resize-none outline-none",
+      },
+    },
+    extensions: [
+      CustomDocument,
+      StarterKit.configure({
+        heading: {
+          HTMLAttributes: {
+            class: "text-2xl font-bold",
+          },
+        },
+        bulletList: {
+          HTMLAttributes: {
+            class: "list-disc mx-4",
+          },
+        },
+        codeBlock: {
+          HTMLAttributes: {
+            class:
+              "bg-slate-700 dark:bg-slate-400 dark:text-slate-900 rounded text-white p-4 width-fit-content text-sm",
+          },
+        },
+        document: false,
+      }),
+    ],
+    content: note?.content ?? "",
+    onUpdate: () => {
+      debouncedHandleChange(formRef.current);
+    },
+  });
 
   useEffect(() => {
     formRef.current?.reset();
-    if (textareaRef.current) {
-      textareaRef.current.focus();
-      textareaRef.current.selectionStart =
-        textareaRef.current?.defaultValue.length;
-      textareaRef.current.selectionEnd =
-        textareaRef.current.defaultValue.length;
-    }
+    editor
+      ?.chain()
+      ?.focus()
+      ?.setContent(note?.content ?? "")
+      .run();
   }, [note?.id]);
 
   function handleChange(form: HTMLFormElement) {
@@ -91,13 +131,13 @@ export default function Index() {
       onChange={(e) => debouncedHandleChange(e.currentTarget)}
     >
       <input type="hidden" name="noteId" value={note.id} />
-      <textarea
-        ref={textareaRef}
-        name="content"
-        defaultValue={note.content}
-        className="selection:bg-emerald-300 selection:text-emerald-900 h-full dark:bg-slate-900 p-2 resize-none outline-none"
-        placeholder="enter note here"
+      <input
+        type="hidden"
+        name="title"
+        value={editor?.getText()?.split("\n")?.[0] ?? "No title"}
       />
+      <input type="hidden" name="content" value={editor?.getHTML() ?? ""} />
+      <EditorContent editor={editor} />
     </Form>
   );
 }
