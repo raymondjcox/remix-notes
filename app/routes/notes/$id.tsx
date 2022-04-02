@@ -73,6 +73,11 @@ export default function Index() {
     extensions: [
       CustomDocument,
       StarterKit.configure({
+        codeBlock: {
+          HTMLAttributes: {
+            class: "max-w-prose",
+          },
+        },
         document: false,
       }),
     ],

@@ -1238,6 +1238,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   max-width: none !important;
 }
 
+.max-w-prose {
+  max-width: 65ch;
+}
+
 .flex-initial {
   flex: 0 1 auto;
 }
