@@ -226,6 +226,9 @@ function Header() {
 
 function NotesList() {
   const { notes } = useLoaderData<DataLoaderResponse>();
+  if (notes.length === 0) {
+    return null;
+  }
   return (
     <div className="overflow-auto flex-initial min-h-0 basis-1/3 sm:basis-3/12 h-full border-t sm:border-t-0 sm:border-r dark:border-slate-800 min-w-0">
       <ul className="overflow-auto mx-3 mt-3 ">
