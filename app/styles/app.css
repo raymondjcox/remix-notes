@@ -1222,6 +1222,22 @@ Ensure the default browser behavior of the `hidden` attribute.
   min-width: 0px;
 }
 
+.max-w-full {
+  max-width: 100%;
+}
+
+.\!max-w-full {
+  max-width: 100% !important;
+}
+
+.max-w-none {
+  max-width: none;
+}
+
+.\!max-w-none {
+  max-width: none !important;
+}
+
 .flex-initial {
   flex: 0 1 auto;
 }
